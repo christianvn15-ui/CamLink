@@ -1,8 +1,4 @@
-/* CamLink PWA - WebRTC two-device streaming
-   Camera device: starts local media, creates offer, writes to Firebase {sessions/{code}}.
-   Viewer device: reads offer, creates answer, writes back; receives remote stream.
-   ICE candidates exchanged via Firebase child nodes.
-*/
+/* CamLink PWA - WebRTC two-device streaming */
 
 const statusText = document.getElementById('statusText');
 const roleText = document.getElementById('roleText');
@@ -47,12 +43,7 @@ document.getElementById('genCodeBtn').addEventListener('click', () => {
   document.getElementById('cameraCode').value = generateCode();
 });
 
-// STUN servers
-const rtcConfig = {
-  iceServers: [
-    { urls: ['stun:stun.l.google.com:19302'] }
-  ]
-};
+const rtcConfig = { iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }] };
 
 // Firebase helpers
 async function initFirebaseSession(code) {
@@ -80,10 +71,18 @@ async function startCamera() {
   setStatus('Accessing camera...');
 
   try {
-    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    const facingMode = document.getElementById('cameraFacing').value;
+    const includeAudio = document.getElementById('enableAudio').checked;
+
+    localStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode },
+      audio: includeAudio
+    });
+
     document.getElementById('localVideo').srcObject = localStream;
 
-    const { baseRef, offerRef, answerRef, camCandidatesRef, viewerCandidatesRef, helpers } = await initFirebaseSession(code);
+    const { baseRef, offerRef, answerRef, camCandidatesRef, viewerCandidatesRef, helpers } =
+      await initFirebaseSession(code);
     sessionRef = { baseRef, offerRef, answerRef, camCandidatesRef, viewerCandidatesRef, helpers };
 
     pc = new RTCPeerConnection(rtcConfig);
@@ -133,7 +132,8 @@ async function connectViewer() {
   setStatus('Connecting...');
 
   try {
-    const { baseRef, offerRef, answerRef, camCandidatesRef, viewerCandidatesRef, helpers } = await initFirebaseSession(code);
+    const { baseRef, offerRef, answerRef, camCandidatesRef, viewerCandidatesRef, helpers } =
+      await initFirebaseSession(code);
     sessionRef = { baseRef, offerRef, answerRef, camCandidatesRef, viewerCandidatesRef, helpers };
 
     pc = new RTCPeerConnection(rtcConfig);
@@ -231,4 +231,4 @@ if ('serviceWorker' in navigator) {
 // HTTPS check
 if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
   setStatus('Note: Use HTTPS for camera access.');
-}
+} 
