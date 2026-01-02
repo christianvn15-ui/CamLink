@@ -1,0 +1,14 @@
+{
+  "name": "CamLink",
+  "short_name": "CamLink",
+  "description": "Two-device camera streaming PWA using WebRTC",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0b0f14",
+  "theme_color": "#0b0f14",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "prefer_related_applications": false
+}

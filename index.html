@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CamLink PWA</title>
+  <meta name="description" content="Two-device camera streaming PWA using WebRTC" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0b0f14" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M12 2l7 3v6c0 5-3.5 9.74-7 11-3.5-1.26-7-6-7-11V5l7-3z"></path>
+        <circle cx="12" cy="12" r="3" fill="currentColor"></circle>
+      </svg>
+      <span class="brand-text">CamLink</span>
+    </div>
+    <button id="installBtn" class="btn btn-ghost" hidden>Install app</button>
+  </header>
+
+  <main class="container">
+    <section class="mode-select">
+      <h1>Two-device camera streaming</h1>
+      <p class="muted">Install on both phones. Set one as Camera and the other as Remote using the same session code.</p>
+
+      <div class="cards">
+        <article class="card">
+          <h2>Camera</h2>
+          <p>Streams your camera to a paired remote device.</p>
+          <div class="form-row">
+            <label for="cameraCode">Session code</label>
+            <input id="cameraCode" type="text" placeholder="e.g., 784-236" />
+          </div>
+          <div class="row gap">
+            <button id="genCodeBtn" class="btn btn-ghost">Generate code</button>
+            <button id="startCameraBtn" class="btn btn-primary">Start camera</button>
+          </div>
+          <div class="row gap">
+            <label class="inline">
+              <input id="rearCam" type="checkbox" checked /> Use rear camera
+            </label>
+            <label class="inline">
+              <input id="torchToggle" type="checkbox" /> Torch (if supported)
+            </label>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Remote</h2>
+          <p>View the camera feed live on this device.</p>
+          <div class="form-row">
+            <label for="viewerCode">Session code</label>
+            <input id="viewerCode" type="text" placeholder="Enter code from Camera" />
+          </div>
+          <button id="connectViewerBtn" class="btn btn-primary">Connect & view</button>
+        </article>
+      </div>
+    </section>
+
+    <section class="streams">
+      <div class="stream-card">
+        <h3>Local preview (camera device)</h3>
+        <video id="localVideo" autoplay playsinline muted></video>
+        <div class="controls">
+          <button id="captureBtn" class="btn btn-ghost">Capture snapshot</button>
+          <button id="hangupBtn" class="btn btn-ghost danger">Hang up</button>
+        </div>
+        <canvas id="snapshotCanvas" class="snapshot" aria-label="Snapshot canvas"></canvas>
+      </div>
+
+      <div class="stream-card">
+        <h3>Remote view (viewer device)</h3>
+        <video id="remoteVideo" autoplay playsinline></video>
+      </div>
+    </section>
+
+    <section class="status">
+      <div class="status-row"><strong>Status:</strong> <span id="statusText">Idle</span></div>
+      <div class="status-row"><strong>Role:</strong> <span id="roleText">None</span></div>
+      <div class="status-row"><strong>Hints:</strong> <span class="muted">Use HTTPS. Grant camera permission. Keep both devices online until connected.</span></div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <small>&copy; <span id="year"></span> CamLink. Peer-to-peer video via WebRTC.</small>
+  </footer>
+
+  <script src="firebase-config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
