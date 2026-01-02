@@ -28,6 +28,13 @@ window.addEventListener('beforeinstallprompt', (e) => {
   });
 });
 
+// Hide install button after installation
+window.addEventListener('appinstalled', () => {
+  const installBtn = document.getElementById('installBtn');
+  installBtn.hidden = true;
+  setStatus('App installed successfully!');
+});
+
 function setStatus(text) { statusText.textContent = text; }
 function setRole(text) { roleText.textContent = text; }
 
@@ -142,13 +149,14 @@ async function connectViewer() {
 
     helpers.onValue(offerRef, async (snapshot) => {
       const offer = snapshot.val();
-      if (offer && !pc.currentRemoteDescription) {
-        await pc.setRemoteDescription(new RTCSessionDescription(offer));
-        const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
-        await window.FirebaseRTDB.set(answerRef, { sdp: answer.sdp, type: answer.type });
-        setStatus('Answer sent. Connecting...');
-      }
+      if (!offer) { setStatus('Waiting for camera offer...'); return; }
+      if (pc.currentRemoteDescription) return;
+
+      await pc.setRemoteDescription(new RTCSessionDescription(offer));
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      await window.FirebaseRTDB.set(answerRef, { sdp: answer.sdp, type: answer.type });
+      setStatus('Answer sent. Establishing connection...');
     });
 
     helpers.onChildAdded(camCandidatesRef, async (snapshot) => {
@@ -180,6 +188,18 @@ async function hangup() {
     setStatus('Idle');
   }
 }
+
+// Fullscreen toggle for remote view
+document.getElementById('fullscreenBtn')?.addEventListener('click', () => {
+  const remoteVideo = document.getElementById('remoteVideo');
+  if (remoteVideo.requestFullscreen) {
+    remoteVideo.requestFullscreen();
+  } else if (remoteVideo.webkitRequestFullscreen) {
+    remoteVideo.webkitRequestFullscreen();
+  } else if (remoteVideo.msRequestFullscreen) {
+    remoteVideo.msRequestFullscreen();
+  }
+});
 
 // Wire UI
 document.getElementById('startCameraBtn').addEventListener('click', startCamera);
