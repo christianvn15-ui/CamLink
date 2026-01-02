@@ -56,17 +56,16 @@
           <input id="cameraCode" type="text" placeholder="e.g., 784-236" />
 
           <!-- Camera options -->
-          <label>
-            Camera:
-            <select id="cameraFacing">
-              <option value="user">Front</option>
-              <option value="environment">Rear</option>
-            </select>
-          </label>
-          <label>
-            <input type="checkbox" id="enableAudio" />
-            Include audio
-          </label>
+          <div class="row gap">
+            <label>
+              Camera:
+              <select id="cameraDevice"></select>
+            </label>
+            <label>
+              <input type="checkbox" id="enableAudio" />
+              Include audio
+            </label>
+          </div>
 
           <div class="row gap">
             <button id="genCodeBtn" class="btn btn-ghost">Generate code</button>
