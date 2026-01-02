@@ -147,11 +147,26 @@ async function connectViewer() {
       if (event.candidate) await helpers.push(viewerCandidatesRef, event.candidate.toJSON());
     };
 
-    helpers.onValue(offerRef, async (snapshot) => {
+    // First try to read the offer once
+    offerRef.once('value').then(async (snapshot) => {
       const offer = snapshot.val();
-      if (!offer) { setStatus('Waiting for camera offer...'); return; }
-      if (pc.currentRemoteDescription) return;
+      if (!offer) {
+        setStatus('Waiting for camera offer...');
+        // Fallback listener if offer not yet published
+        helpers.onValue(offerRef, async (snap) => {
+          const delayedOffer = snap.val();
+          if (delayedOffer && !pc.currentRemoteDescription) {
+            await pc.setRemoteDescription(new RTCSessionDescription(delayedOffer));
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+            await window.FirebaseRTDB.set(answerRef, { sdp: answer.sdp, type: answer.type });
+            setStatus('Answer sent. Establishing connection...');
+          }
+        });
+        return;
+      }
 
+      // Offer exists immediately
       await pc.setRemoteDescription(new RTCSessionDescription(offer));
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
@@ -159,6 +174,7 @@ async function connectViewer() {
       setStatus('Answer sent. Establishing connection...');
     });
 
+    // Listen for ICE candidates from camera
     helpers.onChildAdded(camCandidatesRef, async (snapshot) => {
       const candidate = snapshot.val();
       if (candidate) await pc.addIceCandidate(new RTCIceCandidate(candidate));
