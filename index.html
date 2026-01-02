@@ -54,6 +54,20 @@
           <h2>Camera</h2>
           <p>Streams your camera to a paired remote device.</p>
           <input id="cameraCode" type="text" placeholder="e.g., 784-236" />
+
+          <!-- Camera options -->
+          <label>
+            Camera:
+            <select id="cameraFacing">
+              <option value="user">Front</option>
+              <option value="environment">Rear</option>
+            </select>
+          </label>
+          <label>
+            <input type="checkbox" id="enableAudio" />
+            Include audio
+          </label>
+
           <div class="row gap">
             <button id="genCodeBtn" class="btn btn-ghost">Generate code</button>
             <button id="startCameraBtn" class="btn btn-primary">Start camera</button>
@@ -74,7 +88,6 @@
         <h3>Local preview</h3>
         <video id="localVideo" autoplay playsinline muted></video>
       </div>
-      <!-- Updated Remote view with fullscreen button -->
       <div class="stream-card">
         <h3>Remote view</h3>
         <video id="remoteVideo" autoplay playsinline></video>
